@@ -16,10 +16,10 @@ public class MarvinServletContainerInitializer implements ServletContainerInitia
     @Override
     public void onStartup(Set<Class<?>> set, ServletContext sc) throws ServletException {
         List<WebApplicationInitializer> initializers = new LinkedList<>();
-
+        sc.log("Marvin MarvinServletContainerInitializer onStartup");
         if (set != null) {
             for (Class<?> waiClass : set) {
-				// Be defensive: Some servlet containers provide us with invalid classes,
+		// Be defensive: Some servlet containers provide us with invalid classes,
                 // no matter what @HandlesTypes says...
                 if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers())
                         && WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
