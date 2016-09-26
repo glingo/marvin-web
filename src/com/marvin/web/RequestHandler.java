@@ -17,6 +17,8 @@ import com.marvin.web.event.GetResponseForControllerResultEvent;
 import com.marvin.web.event.GetResponseForExceptionEvent;
 import com.marvin.web.event.RequestHandlerEvent;
 import com.marvin.web.event.RequestHandlerEvents;
+import com.marvin.web.exception.HttpException;
+import com.marvin.web.exception.NotFoundHttpException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,20 +58,30 @@ public class RequestHandler {
         return filterEvent.getResponse();
     }
 
-    private HttpServletResponse handleException(Exception exception, HttpServletRequest request) throws Exception {
+    private HttpServletResponse handleException(Exception exception, HttpServletRequest request, HttpServletResponse response) throws Exception {
         GetResponseForExceptionEvent exceptionEvent = new GetResponseForExceptionEvent(this, request, exception);
         this.dispatcher.dispatch(RequestHandlerEvents.EXCEPTION, exceptionEvent);
         
         exception = exceptionEvent.getException();
         
-        if(!exceptionEvent.hasResponse()) {
-            finishRequest(request);
-            
-            throw new Exception(exception);
+        // in servlet we always have a response !
+//        if(!exceptionEvent.hasResponse()) {
+//            finishRequest(request);
+//            
+//            throw new Exception(exception);
+//        }
+        
+//        response = exceptionEvent.getResponse();
+//        System.out.println("qsdq");
+        if(exception instanceof HttpException) {
+            HttpException exc = (HttpException) exception;
+//            System.out.println("http excpetion");
+//            response.setStatus(exc.getStatusCode());
+            response.sendError(exc.getStatusCode(), exc.getMessage());
+            // send header
+//            response.addHeader(null, null);
         }
-        
-        HttpServletResponse response = exceptionEvent.getResponse();
-        
+
         try {
             return filterResponse(request, response);
         } catch(Exception e) {
@@ -88,7 +100,7 @@ public class RequestHandler {
                 throw e;
             }
             
-            return handleException(e, request);
+            return handleException(e, request, response);
         }
     }
     
@@ -112,7 +124,7 @@ public class RequestHandler {
         ControllerReference controller = this.ctrlResolver.resolveController(request);
 
         if(controller == null){
-            throw new Exception("No controller for " + request.getRequestURI());
+            throw new NotFoundHttpException("No controller for " + request.getRequestURI());
         }
         
         // filter controller via event
@@ -159,6 +171,7 @@ public class RequestHandler {
             
         }
         
+        // use a view resolver.
         response.getWriter().print(controllerResponse);
         
         // filter la response ( pop request )

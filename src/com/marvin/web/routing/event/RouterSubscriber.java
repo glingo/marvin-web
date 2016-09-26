@@ -25,10 +25,12 @@ public class RouterSubscriber implements SubscriberInterface<RequestHandlerEvent
         if(event instanceof GetResponseEvent) {
             HttpServletRequest request = event.getRequest();
             
-            RouteCollection routeCollection = router.getRouteCollection();
-            RequestMatcherInterface matcher = (RequestMatcherInterface) router.getMatcher();
-            
-            HashMap<String, Object> attributes = matcher.matchRequest(routeCollection, event.getRequest());
+            HashMap<String, Object> attributes = router.match(event.getRequest().getRequestURI());
+
+//            RouteCollection routeCollection = router.getRouteCollection();
+//            RequestMatcherInterface matcher = (RequestMatcherInterface) router.getMatcher();
+//            
+//            HashMap<String, Object> attributes = matcher.matchRequest(routeCollection, event.getRequest());
             
             if(attributes != null) {
                 attributes.forEach(request::setAttribute);

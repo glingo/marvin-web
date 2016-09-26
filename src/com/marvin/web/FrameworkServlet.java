@@ -1,9 +1,7 @@
 package com.marvin.web;
 
 import com.marvin.component.kernel.Kernel;
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -76,14 +74,13 @@ public class FrameworkServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try {
+            
             getServletContext().log(String.format("process request %s !", request.getRequestURI()));
             response = getRequestHandler().handle(request, response, true);
             response.flushBuffer();
         } catch (Exception ex) {
-            Logger.getLogger(FrameworkServlet.class.getName()).log(Level.SEVERE, null, ex);
+            
         }
-        
-        
     }
 
 }
