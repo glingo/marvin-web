@@ -1,6 +1,6 @@
 package com.marvin.bundle.web.event;
 
-import com.marvin.component.kernel.controller.ControllerReference;
+import com.marvin.bundle.framework.controller.ControllerReference;
 import com.marvin.bundle.web.RequestHandler;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;

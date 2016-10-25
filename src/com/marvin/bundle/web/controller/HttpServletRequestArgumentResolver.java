@@ -1,8 +1,8 @@
 package com.marvin.bundle.web.controller;
 
-import com.marvin.component.kernel.controller.ArgumentResolver;
-import com.marvin.component.kernel.controller.ArgumentValueResolverInterface;
-import com.marvin.component.kernel.controller.argumentResolver.DefaultValueResolver;
+import com.marvin.bundle.framework.controller.argument.ArgumentResolver;
+import com.marvin.bundle.framework.controller.argument.ArgumentValueResolverInterface;
+import com.marvin.bundle.framework.controller.argument.argumentResolver.DefaultValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestAtributeValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestValueResolver;
 import java.util.ArrayList;

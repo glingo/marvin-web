@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Stack;
 
 import com.marvin.component.event.EventDispatcher;
-import com.marvin.component.kernel.controller.ArgumentResolver;
-import com.marvin.component.kernel.controller.ControllerReference;
-import com.marvin.component.kernel.controller.ControllerResolverInterface;
+import com.marvin.bundle.framework.controller.argument.ArgumentResolver;
+import com.marvin.bundle.framework.controller.ControllerReference;
+import com.marvin.bundle.framework.controller.ControllerResolverInterface;
 import com.marvin.component.util.ReflectionUtils;
 import com.marvin.bundle.web.event.FilterControllerArgumentsEvent;
 import com.marvin.bundle.web.event.FilterControllerEvent;
@@ -19,6 +19,7 @@ import com.marvin.bundle.web.event.RequestHandlerEvent;
 import com.marvin.bundle.web.event.RequestHandlerEvents;
 import com.marvin.bundle.web.exception.HttpException;
 import com.marvin.bundle.web.exception.NotFoundHttpException;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,17 +49,23 @@ public class RequestHandler {
         this.requestStack.pop();
     }
     
-    private HttpServletResponse filterResponse(HttpServletRequest request, HttpServletResponse response) {
+    private void filterResponse(HttpServletRequest request, HttpServletResponse response) {
         
         FilterResponseEvent filterEvent = new FilterResponseEvent(this, request, response);
         this.dispatcher.dispatch(RequestHandlerEvents.RESPONSE, filterEvent);
         
         finishRequest(request);
         
-        return filterEvent.getResponse();
+        filterEvent.getResponse();
     }
 
-    private HttpServletResponse handleException(Exception exception, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private void handleException(Exception exception, HttpServletRequest request, HttpServletResponse response) throws IOException {
+       
+        if(response.isCommitted()) {
+            // nothing else to do.
+            return;
+        }
+        
         GetResponseForExceptionEvent exceptionEvent = new GetResponseForExceptionEvent(this, request, exception);
         this.dispatcher.dispatch(RequestHandlerEvents.EXCEPTION, exceptionEvent);
         
@@ -70,52 +77,53 @@ public class RequestHandler {
 //            
 //            throw new Exception(exception);
 //        }
-        
+
 //        response = exceptionEvent.getResponse();
-//        System.out.println("qsdq");
+
         if(exception instanceof HttpException) {
             HttpException exc = (HttpException) exception;
-//            System.out.println("http excpetion");
-//            response.setStatus(exc.getStatusCode());
             response.sendError(exc.getStatusCode(), exc.getMessage());
             // send header
 //            response.addHeader(null, null);
         }
-
-        try {
-            return filterResponse(request, response);
-        } catch(Exception e) {
-            return response;
-        }
+        
+        filterResponse(request, response);
+        
+        // traitement a effectuer dans un getresponseforexception event listener.
+        System.err.println("Oooups !");
+        exception.printStackTrace();
+//        exception.printStackTrace(response.getWriter());
     }
     
-    public HttpServletResponse handle(HttpServletRequest request, HttpServletResponse response, boolean capture) throws Exception {
+    public void handle(HttpServletRequest request, HttpServletResponse response, boolean capture) throws Exception {
         
         try {
-           return handlePart(request, response);
+           handlePart(request, response);
         } catch(Exception e) {
-            
             if(!capture) {
                 finishRequest(request);
                 throw e;
             }
             
-            return handleException(e, request, response);
+            handleException(e, request, response);
         }
     }
     
-    private HttpServletResponse handlePart(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private void handlePart(HttpServletRequest request, HttpServletResponse response) throws Exception {
         long start = new Date().getTime();
         
         // stack request
         requestStack.push(request);
+        
+        // useless, dans une Serlvet nous avons déja la response !
+        // (changer le nom car c'est l'event qui declenche le requesthandler)
         
         // Dispatch event Request ( get response )
         GetResponseEvent responseEvent = new GetResponseEvent(this, request);
         this.dispatcher.dispatch(RequestHandlerEvents.REQUEST, responseEvent);
         
         if(responseEvent.hasResponse()) {
-             return filterResponse(request, responseEvent.getResponse());
+            filterResponse(request, responseEvent.getResponse());
         }
         
         request = responseEvent.getRequest();
@@ -175,12 +183,15 @@ public class RequestHandler {
         response.getWriter().print(controllerResponse);
         
         // filter la response ( pop request )
-        response = filterResponse(request, response);
+        filterResponse(request, response);
+        
+        // flush here ?
+        response.flushBuffer();
         
         long end = new Date().getTime();
         System.out.format("%s executed in %s ms\n", controller, end - start);
 
-        return response;
+//        return response;
     }
 
     @Override

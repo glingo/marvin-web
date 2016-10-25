@@ -1,4 +1,4 @@
-package com.marvin.bundle.web.routing.event;
+package com.marvin.bundle.web;
 
 import com.marvin.component.event.subscriber.SubscriberInterface;
 import com.marvin.component.routing.Router;

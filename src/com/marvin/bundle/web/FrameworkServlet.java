@@ -1,9 +1,8 @@
 package com.marvin.bundle.web;
 
+import com.marvin.component.container.Container;
 import com.marvin.component.kernel.Kernel;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +12,11 @@ public class FrameworkServlet extends HttpServlet {
 
     private final Kernel kernel;
 
+    private RequestHandler handler;
+    
     public FrameworkServlet(Kernel kernel) {
         this.kernel = kernel;
     }
-    
-    private RequestHandler handler;
     
     private RequestHandler getRequestHandler(){
         if(handler == null) {
@@ -74,12 +73,11 @@ public class FrameworkServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try {
-            
+//            System.out.println(kernel.getContainer().get("container", Container.class));
             getServletContext().log(String.format("process request %s !", request.getRequestURI()));
-            response = getRequestHandler().handle(request, response, true);
-            response.flushBuffer();
+            getRequestHandler().handle(request, response, true);
         } catch (Exception ex) {
-            
+            response.sendError(500);
         }
     }
 
