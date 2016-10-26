@@ -1,14 +1,18 @@
 package com.marvin.bundle.web;
 
+import java.io.IOException;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 
 import com.marvin.component.event.EventDispatcher;
+import com.marvin.component.util.ReflectionUtils;
+
 import com.marvin.bundle.framework.controller.argument.ArgumentResolver;
 import com.marvin.bundle.framework.controller.ControllerReference;
 import com.marvin.bundle.framework.controller.ControllerResolverInterface;
-import com.marvin.component.util.ReflectionUtils;
+
 import com.marvin.bundle.web.event.FilterControllerArgumentsEvent;
 import com.marvin.bundle.web.event.FilterControllerEvent;
 import com.marvin.bundle.web.event.FilterResponseEvent;
@@ -19,7 +23,7 @@ import com.marvin.bundle.web.event.RequestHandlerEvent;
 import com.marvin.bundle.web.event.RequestHandlerEvents;
 import com.marvin.bundle.web.exception.HttpException;
 import com.marvin.bundle.web.exception.NotFoundHttpException;
-import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -90,7 +94,7 @@ public class RequestHandler {
         filterResponse(request, response);
         
         // traitement a effectuer dans un getresponseforexception event listener.
-        System.err.println("Oooups !");
+//        System.err.println("Oooups !");
         exception.printStackTrace();
 //        exception.printStackTrace(response.getWriter());
     }
@@ -113,10 +117,10 @@ public class RequestHandler {
         long start = new Date().getTime();
         
         // stack request
-        requestStack.push(request);
+        this.requestStack.push(request);
         
         // useless, dans une Serlvet nous avons déja la response !
-        // (changer le nom car c'est l'event qui declenche le requesthandler)
+        // (changer le nom car c'est l'event qui declenche le routerSubscriber)
         
         // Dispatch event Request ( get response )
         GetResponseEvent responseEvent = new GetResponseEvent(this, request);
@@ -132,7 +136,10 @@ public class RequestHandler {
         ControllerReference controller = this.ctrlResolver.resolveController(request);
 
         if(controller == null){
-            throw new NotFoundHttpException("No controller for " + request.getRequestURI());
+            String msg = String.format(
+                    "No controller found for %s", request.getRequestURI());
+            
+            throw new NotFoundHttpException(msg);
         }
         
         // filter controller via event
@@ -149,22 +156,27 @@ public class RequestHandler {
         this.dispatcher.dispatch(RequestHandlerEvents.CONTROLLER_ARGUMENTS, argsEvent);
         
         controller = argsEvent.getController();
-        arguments = argsEvent.getArguments();
+        arguments  = argsEvent.getArguments();
         
         // direct call controller
-        Object controllerResponse = ReflectionUtils.invokeMethod(controller.getAction(), 
+        Object controllerResponse = 
+                ReflectionUtils.invokeMethod(controller.getAction(), 
                 controller.getHolder(), arguments.toArray());
 
         // typer la response
         if(!(controllerResponse instanceof String)) {
             
             // get response for controller result
-            GetResponseForControllerResultEvent responseForControllerEvent = new GetResponseForControllerResultEvent(this, request, controllerResponse);
-            this.dispatcher.dispatch(RequestHandlerEvents.RESPONSE, responseForControllerEvent);
+            GetResponseForControllerResultEvent rfce = new GetResponseForControllerResultEvent(this, request, controllerResponse);
+            this.dispatcher.dispatch(RequestHandlerEvents.RESPONSE, rfce);
 
-            if(responseForControllerEvent.hasResponse()) {
-                controllerResponse = responseForControllerEvent.getResponse();
+            if(rfce.hasResponse()) {
+                controllerResponse = rfce.getResponse();
             }
+            
+            // controller will not return a String but he should return 
+            //  - the view ( as an object or name )
+            //  - the model ( as a Map or complete it )
             
             if(!(controllerResponse instanceof String)) {
                 // should it return a response ? 
