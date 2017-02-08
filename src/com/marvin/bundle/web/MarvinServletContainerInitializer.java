@@ -21,8 +21,10 @@ public class MarvinServletContainerInitializer implements ServletContainerInitia
             for (Class<?> waiClass : set) {
 		// Be defensive: Some servlet containers provide us with invalid classes,
                 // no matter what @HandlesTypes says...
-                if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers())
+                if (!waiClass.isInterface() 
+                        && !Modifier.isAbstract(waiClass.getModifiers())
                         && WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
+                    
                     try {
                         initializers.add((WebApplicationInitializer) ReflectionUtils.accessibleConstructor(waiClass).newInstance());
                     } catch (Throwable ex) {

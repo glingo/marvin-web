@@ -1,7 +1,13 @@
 package com.marvin.bundle.web;
 
+import com.marvin.bundle.framework.handler.Handler;
+import com.marvin.bundle.framework.mvc.ModelAndView;
+import com.marvin.bundle.framework.mvc.view.IView;
+import com.marvin.bundle.web.view.JSPView;
+import com.marvin.component.container.exception.ContainerException;
 import java.io.IOException;
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,17 +17,17 @@ import com.marvin.component.kernel.Kernel;
 public class FrameworkServlet extends HttpServlet {
 
     private final Kernel kernel;
-
-    private RequestHandler handler;
+    private Handler handler;
     
     public FrameworkServlet(Kernel kernel) {
         this.kernel = kernel;
     }
     
-    private RequestHandler getRequestHandler(){
-        if(handler == null) {
-            this.handler = kernel.getContainer()
-                    .get("request_handler", RequestHandler.class);
+    private Handler getRequestHandler() throws ContainerException {
+        if(this.handler == null) {
+            
+            getServletContext().log("Trying to retrive the request handler.");
+            this.handler = this.kernel.getContainer().get("request_handler", Handler.class);
         }
         
         return this.handler;
@@ -29,7 +35,12 @@ public class FrameworkServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        kernel.boot();
+        try {
+            this.kernel.boot();
+            this.handler = getRequestHandler();
+        } catch (ContainerException ex) {
+            getServletContext().log(null, ex);
+        }
     }
     
     /**
@@ -72,11 +83,21 @@ public class FrameworkServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        getServletContext().log("Processing a request : " + request.getServletPath());
+        
         try {
-//            getServletContext().log(String.format("process request %s !", request.getRequestURI()));
-            getRequestHandler().handle(request, response, true);
+            ModelAndView mav = this.handler.handle(request, response, true);
+        
+            // use a view resolver.
+//            response.getWriter().print(controllerResponse);
+            // flush here ?
+//            response.flushBuffer();
+//        2801752
         } catch (Exception ex) {
-            response.sendError(500);
+             getServletContext().log("Exception : ", ex);
+            if(!response.isCommitted()) {
+                response.sendError(500, ex.getMessage());
+            }
         }
     }
 

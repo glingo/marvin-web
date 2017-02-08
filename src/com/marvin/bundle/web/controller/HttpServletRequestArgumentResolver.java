@@ -1,10 +1,11 @@
 package com.marvin.bundle.web.controller;
 
-import com.marvin.bundle.framework.controller.argument.ArgumentResolver;
-import com.marvin.bundle.framework.controller.argument.ArgumentValueResolverInterface;
-import com.marvin.bundle.framework.controller.argument.argumentResolver.DefaultValueResolver;
+import com.marvin.component.kernel.controller.argument.ArgumentResolver;
+import com.marvin.component.kernel.controller.argument.ArgumentValueResolverInterface;
+import com.marvin.component.kernel.controller.argument.argumentResolver.DefaultValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestAtributeValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestValueResolver;
+import com.marvin.bundle.web.controller.argumentResolver.HttpServletResponseValueResolver;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class HttpServletRequestArgumentResolver extends ArgumentResolver {
         resolvers.add(new DefaultValueResolver());
         resolvers.add(new HttpServletRequestAtributeValueResolver());
         resolvers.add(new HttpServletRequestValueResolver());
+        resolvers.add(new HttpServletResponseValueResolver());
         
         return resolvers;
     } 

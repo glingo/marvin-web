@@ -13,25 +13,48 @@
     <services>
         
         <!-- 
-        
-                      HTTP
-        
+                    HTTP
         -->
+        
+        <service id="view.url_resolver" class="com.marvin.bundle.web.view.URLViewResolver"> 
+            <argument type="java.lang.String" value="/WEB-INF/jsp/" />
+            <argument type="java.lang.String" value=".jsp" />
+        </service>
+        
+        <service id="http.view_resolver" class="com.marvin.bundle.framework.mvc.view.resolver.ViewResolverDelegate"> 
+            <argument>
+                <list>
+                    <argument type="service" ref="view.url_resolver" />
+                </list>
+            </argument>
+        </service>
+        
         <service id="http.argument_resolver" class="com.marvin.bundle.web.controller.HttpServletRequestArgumentResolver" /> 
         
-        <service id="http.controller.resolver" class="com.marvin.bundle.web.controller.HttpServletRequestControllerResolver">
+        <service id="http.controller_resolver" class="com.marvin.bundle.web.controller.HttpServletRequestControllerResolver">
             <argument type="service" ref="controller.name_parser"/>
         </service>
         
-        <service id="request_handler" class="com.marvin.bundle.web.RequestHandler">
+        <service id="request_handler" class="com.marvin.bundle.framework.handler.Handler">
             <argument type="service" ref="event_dispatcher"/>
-            <argument type="service" ref="http.controller.resolver"/>
+            <argument type="service" ref="http.controller_resolver"/>
             <argument type="service" ref="http.argument_resolver"/>
+            <argument type="service" ref="http.view_resolver"/>
         </service>
         
+<!--        <service id="request_handler" class="com.marvin.bundle.web.RequestHandler">
+            <argument type="service" ref="event_dispatcher"/>
+            <argument type="service" ref="http.controller_resolver"/>
+            <argument type="service" ref="http.argument_resolver"/>
+        </service>-->
+        
         <!-- Router subscriber definition -->
-        <service id="router.subscriber" class="com.marvin.bundle.web.RouterSubscriber">
+        <service id="router.subscriber" class="com.marvin.bundle.web.subscriber.RouterSubscriber">
             <argument type="service" ref="router"/>
+            <tag name="event_subscriber"/>
+        </service>
+           
+        <service id="resource.subscriber" class="com.marvin.bundle.web.subscriber.ResourceSubscriber">
             <tag name="event_subscriber"/>
         </service>
         
