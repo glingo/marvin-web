@@ -29,7 +29,17 @@
             </argument>
         </service>
         
-        <service id="http.argument_resolver" class="com.marvin.bundle.web.controller.HttpServletRequestArgumentResolver" /> 
+        <service id="http_request_attribute.argument_resolver" class="com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestAtributeValueResolver">
+            <tag name="argument_resolver" />
+        </service> 
+        
+        <service id="http_request_value.argument_resolver" class="com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestValueResolver">
+            <tag name="argument_resolver" />
+        </service>
+        
+        <service id="http_response_value.argument_resolver" class="com.marvin.bundle.web.controller.argumentResolver.HttpServletResponseValueResolver">
+            <tag name="argument_resolver" />
+        </service>
         
         <service id="http.controller_resolver" class="com.marvin.bundle.web.controller.HttpServletRequestControllerResolver">
             <argument type="service" ref="controller.name_parser"/>
@@ -38,7 +48,7 @@
         <service id="request_handler" class="com.marvin.bundle.framework.handler.Handler">
             <argument type="service" ref="event_dispatcher"/>
             <argument type="service" ref="http.controller_resolver"/>
-            <argument type="service" ref="http.argument_resolver"/>
+            <argument type="service" ref="argument_resolver"/>
             <argument type="service" ref="http.view_resolver"/>
         </service>
         
