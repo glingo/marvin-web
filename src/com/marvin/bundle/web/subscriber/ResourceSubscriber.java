@@ -111,7 +111,7 @@ public class ResourceSubscriber extends EventSubscriber<HandlerEvent<HttpServlet
         }
         
         @Override
-        public void render(HashMap<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        public void render(HashMap<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
             this.dispatcher.forward(request, response);
         }
     }

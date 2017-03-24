@@ -15,7 +15,7 @@ public class JSPView extends View<HttpServletRequest, HttpServletResponse> {
     }
 
     @Override
-    public void render(HashMap<String, ?> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void render(HashMap<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         if(model != null) {
             model.forEach(request::setAttribute);
         }
