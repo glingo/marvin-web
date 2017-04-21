@@ -2,8 +2,6 @@ package com.marvin.bundle.web;
 
 import com.marvin.bundle.framework.handler.Handler;
 import com.marvin.bundle.framework.mvc.ModelAndView;
-import com.marvin.bundle.framework.mvc.view.IView;
-import com.marvin.bundle.web.view.JSPView;
 import com.marvin.component.container.exception.ContainerException;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -86,13 +84,7 @@ public class FrameworkServlet extends HttpServlet {
         getServletContext().log("Processing a request : " + request.getServletPath());
         
         try {
-            ModelAndView mav = this.handler.handle(request, response, true);
-        
-            // use a view resolver.
-//            response.getWriter().print(controllerResponse);
-            // flush here ?
-//            response.flushBuffer();
-//        2801752
+            this.handler.handle(request, response, true);
         } catch (Exception ex) {
              getServletContext().log("Exception : ", ex);
             if(!response.isCommitted()) {

@@ -10,12 +10,15 @@ import com.marvin.component.routing.Router;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class RouterSubscriber extends EventSubscriber<HandlerEvent<HttpServletRequest, HttpServletResponse>> {
 
+    protected final Logger logger = Logger.getLogger(getClass().getName());
+    
     private final Router router;
 
     public RouterSubscriber(Router router) {
@@ -29,7 +32,6 @@ public class RouterSubscriber extends EventSubscriber<HandlerEvent<HttpServletRe
             
             HttpServletRequest request = e.getRequest();
             
-//            request.getRequestURI()
             Map<String, Object> attributes = this.router.match(request.getServletPath());
         
             if(attributes != null) {
