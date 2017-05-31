@@ -1,7 +1,7 @@
 package com.marvin.bundle.web.controller.argumentResolver;
 
-import com.marvin.component.kernel.controller.argument.ArgumentMetadata;
-import com.marvin.component.kernel.controller.argument.ArgumentValueResolverInterface;
+import com.marvin.component.mvc.controller.argument.ArgumentMetadata;
+import com.marvin.component.mvc.controller.argument.ArgumentValueResolverInterface;
 import com.marvin.component.util.ClassUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

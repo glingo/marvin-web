@@ -1,8 +1,8 @@
 package com.marvin.bundle.web.controller;
 
-import com.marvin.component.kernel.controller.argument.ArgumentResolver;
-import com.marvin.component.kernel.controller.argument.ArgumentValueResolverInterface;
-import com.marvin.component.kernel.controller.argument.argumentResolver.DefaultValueResolver;
+import com.marvin.component.mvc.controller.argument.ArgumentResolver;
+import com.marvin.component.mvc.controller.argument.ArgumentValueResolverInterface;
+import com.marvin.component.mvc.controller.argument.argumentResolver.DefaultValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestAtributeValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletRequestValueResolver;
 import com.marvin.bundle.web.controller.argumentResolver.HttpServletResponseValueResolver;

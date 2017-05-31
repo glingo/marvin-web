@@ -1,7 +1,5 @@
 package com.marvin.bundle.web;
 
-import com.marvin.bundle.framework.handler.Handler;
-import com.marvin.bundle.framework.mvc.ModelAndView;
 import com.marvin.component.container.exception.ContainerException;
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -11,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.marvin.component.kernel.Kernel;
+import com.marvin.bundle.framework.mvc.Handler;
 
 public class FrameworkServlet extends HttpServlet {
 
@@ -25,7 +24,7 @@ public class FrameworkServlet extends HttpServlet {
         if(this.handler == null) {
             
             getServletContext().log("Trying to retrive the request handler.");
-            this.handler = this.kernel.getContainer().get("request_handler", Handler.class);
+            this.handler = this.kernel.getContainer().get("handler", Handler.class);
         }
         
         return this.handler;
