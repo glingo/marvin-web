@@ -81,7 +81,6 @@ public class FrameworkServlet extends HttpServlet {
             throws ServletException, IOException {
         
         getServletContext().log("Processing a request : " + request.getServletPath());
-        
         try {
             this.handler.handle(request, response, true);
         } catch (Exception ex) {

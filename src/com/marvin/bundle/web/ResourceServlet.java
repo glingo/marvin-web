@@ -7,7 +7,6 @@ package com.marvin.bundle.web;
 
 import com.marvin.component.util.StringUtils;
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

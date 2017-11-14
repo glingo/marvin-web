@@ -9,7 +9,7 @@ public class HttpServletRequestAtributeValueResolver implements ArgumentValueRes
 
     @Override
     public boolean support(HttpServletRequest request, HttpServletResponse response, ArgumentMetadata argument) {
-        return !argument.isIsVariadic() && request.getAttribute(argument.getName()) != null;
+        return !argument.isVariadic() && request.getAttribute(argument.getName()) != null;
     }
 
     @Override

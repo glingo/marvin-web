@@ -1,13 +1,11 @@
 package com.marvin.bundle.web.subscriber;
 
-import com.marvin.component.mvc.ModelAndView;
-import event_old.EventConsumer;
-import com.marvin.component.mvc.view.View;
-import event_old.EventSubscriber;
-import com.marvin.bundle.framework.mvc.Handler;
 import com.marvin.bundle.framework.mvc.event.GetResultEvent;
-import com.marvin.bundle.framework.mvc.event.HandlerEvent;
-import com.marvin.bundle.framework.mvc.event.HandlerEvents;
+import com.marvin.component.mvc.ModelAndView;
+import com.marvin.component.mvc.view.View;
+import com.marvin.component.event.dispatcher.DispatcherInterface;
+import com.marvin.component.event.handler.Handler;
+import com.marvin.component.event.subscriber.Subscriber;
 import com.marvin.component.mvc.view.ViewInterface;
 import com.marvin.component.util.ClassUtils;
 
@@ -15,14 +13,13 @@ import com.marvin.component.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class ResourceSubscriber extends EventSubscriber<HandlerEvent> {
+public class ResourceSubscriber extends Subscriber {
 
     /**
      * Default Servlet name used by Tomcat, Jetty, JBoss, and GlassFish
@@ -62,54 +59,60 @@ public class ResourceSubscriber extends EventSubscriber<HandlerEvent> {
         this.defaultServletName = defaultServletName;
     }
 
-    public void onRequest(HandlerEvent event) {
-        if (!ClassUtils.isAssignableValue(GetResultEvent.class, event)) {
-            return;
-        }
-        
-        GetResultEvent e = (GetResultEvent) event;
-
-        if (!ClassUtils.isAssignableValue(HttpServletRequest.class, e.getRequest())) {
-            return;
-        }
-        
-        HttpServletRequest request = (HttpServletRequest) e.getRequest();
-            
-        if(!request.getServletPath().startsWith(this.resourcePath)) {
-            return;
-        }
-
-        ServletContext servletContext = request.getServletContext();
-
-        if(this.defaultServletName == null || !StringUtils.hasLength(this.defaultServletName)) {
-
-            if (servletContext.getNamedDispatcher(COMMON_DEFAULT_SERVLET_NAME) != null) {
-                this.defaultServletName = COMMON_DEFAULT_SERVLET_NAME;
-            } else if (servletContext.getNamedDispatcher(GAE_DEFAULT_SERVLET_NAME) != null) {
-                this.defaultServletName = GAE_DEFAULT_SERVLET_NAME;
-            } else if (servletContext.getNamedDispatcher(RESIN_DEFAULT_SERVLET_NAME) != null) {
-                this.defaultServletName = RESIN_DEFAULT_SERVLET_NAME;
-            } else if (servletContext.getNamedDispatcher(WEBLOGIC_DEFAULT_SERVLET_NAME) != null) {
-                this.defaultServletName = WEBLOGIC_DEFAULT_SERVLET_NAME;
-            } else if (servletContext.getNamedDispatcher(WEBSPHERE_DEFAULT_SERVLET_NAME) != null) {
-                this.defaultServletName = WEBSPHERE_DEFAULT_SERVLET_NAME;
-            } else {
-                throw new IllegalStateException("Unable to locate the default servlet for serving static content. Please set the 'defaultServletName' property explicitly.");
+    public Handler<GetResultEvent> onRequest() {
+        return event -> {
+            if (!ClassUtils.isAssignableValue(GetResultEvent.class, event)) {
+                return;
             }
-        }
-            
-        RequestDispatcher dispatcher = servletContext.getNamedDispatcher(this.defaultServletName);
-        ViewInterface view = new ResourceView(request.getServletPath(), dispatcher);
-        e.setResult(new ModelAndView(view));
+
+            GetResultEvent e = (GetResultEvent) event;
+
+            if (!ClassUtils.isAssignableValue(HttpServletRequest.class, e.getRequest())) {
+                return;
+            }
+
+            HttpServletRequest request = (HttpServletRequest) e.getRequest();
+
+            if(!request.getServletPath().startsWith(this.resourcePath)) {
+                return;
+            }
+
+            ServletContext servletContext = request.getServletContext();
+
+            if(this.defaultServletName == null || !StringUtils.hasLength(this.defaultServletName)) {
+
+                if (servletContext.getNamedDispatcher(COMMON_DEFAULT_SERVLET_NAME) != null) {
+                    this.defaultServletName = COMMON_DEFAULT_SERVLET_NAME;
+                } else if (servletContext.getNamedDispatcher(GAE_DEFAULT_SERVLET_NAME) != null) {
+                    this.defaultServletName = GAE_DEFAULT_SERVLET_NAME;
+                } else if (servletContext.getNamedDispatcher(RESIN_DEFAULT_SERVLET_NAME) != null) {
+                    this.defaultServletName = RESIN_DEFAULT_SERVLET_NAME;
+                } else if (servletContext.getNamedDispatcher(WEBLOGIC_DEFAULT_SERVLET_NAME) != null) {
+                    this.defaultServletName = WEBLOGIC_DEFAULT_SERVLET_NAME;
+                } else if (servletContext.getNamedDispatcher(WEBSPHERE_DEFAULT_SERVLET_NAME) != null) {
+                    this.defaultServletName = WEBSPHERE_DEFAULT_SERVLET_NAME;
+                } else {
+                    throw new IllegalStateException("Unable to locate the default servlet for serving static content. Please set the 'defaultServletName' property explicitly.");
+                }
+            }
+
+            RequestDispatcher dispatcher = servletContext.getNamedDispatcher(this.defaultServletName);
+            ViewInterface view = new ResourceView(request.getServletPath(), dispatcher);
+            e.setResult(new ModelAndView(view));
+        };
     }
 
     @Override
-    public Map<String, EventConsumer<HandlerEvent>> getSubscribedEvents() {
-        Map<String, EventConsumer<HandlerEvent>> subscribed = new HashMap<>();
-        subscribed.put(HandlerEvents.REQUEST, this::onRequest);
-        return subscribed;
+    public void subscribe(DispatcherInterface dispatcher) {
+        dispatcher.register(GetResultEvent.class, onRequest());
     }
-    
+//    @Override
+//    public Map<String, EventConsumer<HandlerEvent>> getSubscribedEvents() {
+//        Map<String, EventConsumer<HandlerEvent>> subscribed = new HashMap<>();
+//        subscribed.put(HandlerEvents.REQUEST, this::onRequest);
+//        return subscribed;
+//    }
+//    
     private class ResourceView extends View<HttpServletRequest, HttpServletResponse> {
         
         private final RequestDispatcher dispatcher;
@@ -120,16 +123,16 @@ public class ResourceSubscriber extends EventSubscriber<HandlerEvent> {
         }
         
         @Override
-        public void render(
-                Handler<HttpServletRequest, HttpServletResponse> handler, 
-                HashMap<String, Object> model, 
-                HttpServletRequest request, 
-                HttpServletResponse response) throws Exception {
-            this.dispatcher.forward(request, response);
+        public void load() throws Exception {
         }
 
         @Override
-        public void load() throws Exception {
+        public void render(com.marvin.bundle.framework.mvc.Handler<HttpServletRequest, 
+                HttpServletResponse> handler, 
+                Map<String, Object> model, 
+                HttpServletRequest request, 
+                HttpServletResponse response) throws Exception {
+            this.dispatcher.forward(request, response);
         }
     }
 }
