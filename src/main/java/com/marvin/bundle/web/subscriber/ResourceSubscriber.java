@@ -1,17 +1,16 @@
 package com.marvin.bundle.web.subscriber;
 
-import com.marvin.bundle.framework.mvc.event.GetResultEvent;
-import com.marvin.component.mvc.ModelAndView;
-import com.marvin.component.mvc.view.View;
+import com.marvin.bundle.framework.mvc.ModelAndView;
+import com.marvin.bundle.framework.mvc.controller.event.GetResultEvent;
+import com.marvin.bundle.framework.mvc.view.View;
 import com.marvin.component.event.dispatcher.DispatcherInterface;
 import com.marvin.component.event.handler.Handler;
 import com.marvin.component.event.subscriber.Subscriber;
-import com.marvin.component.mvc.view.ViewInterface;
+import com.marvin.bundle.framework.mvc.view.ViewInterface;
 import com.marvin.component.util.ClassUtils;
 
 import com.marvin.component.util.StringUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;

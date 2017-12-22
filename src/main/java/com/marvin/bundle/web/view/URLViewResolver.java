@@ -1,6 +1,6 @@
 package com.marvin.bundle.web.view;
 
-import com.marvin.component.mvc.view.ViewInterface;
+import com.marvin.bundle.framework.mvc.view.ViewInterface;
 import com.marvin.component.resolver.PathResolver;
 
 public class URLViewResolver extends PathResolver<ViewInterface> {

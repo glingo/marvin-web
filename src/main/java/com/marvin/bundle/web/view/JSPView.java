@@ -1,7 +1,7 @@
 package com.marvin.bundle.web.view;
 
 import com.marvin.bundle.framework.mvc.Handler;
-import com.marvin.component.mvc.view.View;
+import com.marvin.bundle.framework.mvc.view.View;
 import java.util.Map;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;

@@ -1,8 +1,6 @@
 package com.marvin.bundle.web.subscriber;
 
-import com.marvin.bundle.framework.mvc.event.FilterRequestEvent;
-import com.marvin.bundle.framework.mvc.event.HandlerEvent;
-import com.marvin.bundle.framework.mvc.event.HandlerEvents;
+import com.marvin.bundle.framework.mvc.controller.event.FilterRequestEvent;
 import com.marvin.component.event.dispatcher.DispatcherInterface;
 import com.marvin.component.event.handler.Handler;
 import com.marvin.component.event.subscriber.Subscriber;
@@ -10,7 +8,6 @@ import com.marvin.component.event.subscriber.Subscriber;
 import com.marvin.component.routing.Router;
 import com.marvin.component.util.ClassUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
